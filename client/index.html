@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Lite Board</title>
+    <!-- Load Tailwind CSS for utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to external custom styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<!-- Tailwind configuration to enable the 'dark' class on the parent element -->
+<script>
+    tailwind.config = {
+        darkMode: 'class', // Enable class-based dark mode
+    }
+</script>
+
+<body class="bg-gray-50 dark:bg-gray-900 font-sans min-h-screen flex flex-col transition-colors duration-300">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center sticky top-0 z-10 transition-colors duration-300">
+        <h1 class="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight">
+            Kanban Lite
+        </h1>
+        <div class="flex items-center space-x-4">
+            <!-- New Theme Toggle Button -->
+            <button id="theme-toggle-btn" class="text-2xl p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150" title="Toggle Theme">
+                <!-- Icon will be set by JavaScript (🌙 or ☀️) -->
+            </button>
+            
+            <div id="auth-status" class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <!-- Auth status shown here -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow p-4 md:p-8">
+
+        <!-- 1. Authentication Form (Initial View) -->
+        <section id="auth-section" class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl transition-colors duration-300">
+            <h2 id="auth-title" class="text-2xl font-bold mb-6 text-gray-800 dark:text-white text-center">Login</h2>
+            <form id="auth-form" class="space-y-4">
+                <input type="text" id="username" placeholder="Username" required
+                    class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                <input type="password" id="password" placeholder="Password" required
+                    class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                
+                <button type="submit" id="auth-button"
+                    class="w-full bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-150 shadow-lg dark:bg-indigo-500 dark:hover:bg-indigo-600">
+                    Log In
+                </button>
+                <p id="auth-message" class="text-sm text-center text-red-500 mt-3 hidden"></p>
+                <div class="text-center mt-4">
+                    <button type="button" id="toggle-auth" class="text-sm text-indigo-500 hover:text-indigo-600 transition dark:text-indigo-400 dark:hover:text-indigo-500">
+                        Need an account? Register
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 2. Kanban Board (Hidden until login) -->
+        <section id="board-section" class="hidden">
+            <!-- Add Task Button -->
+            <div class="mb-6 flex justify-between items-center">
+                <h2 class="text-3xl font-semibold text-gray-800 dark:text-white">My Tasks</h2>
+                <button id="add-task-btn"
+                    class="bg-green-500 text-white p-3 rounded-lg font-semibold hover:bg-green-600 transition duration-150 flex items-center shadow-md dark:bg-green-600 dark:hover:bg-green-700">
+                    + Add New Task
+                </button>
+            </div>
+
+            <!-- Task Input Modal (Initially Hidden) -->
+            <div id="task-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 dark:bg-opacity-80 flex justify-center items-center z-20 hidden">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-lg transition-colors duration-300">
+                    <h3 id="modal-title" class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Create New Task</h3>
+                    <form id="new-task-form" class="space-y-4">
+                        <!-- Hidden field to store task ID for editing -->
+                        <input type="hidden" id="edit-task-id" value=""> 
+                        
+                        <input type="text" id="new-task-title" placeholder="Task Title" required
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                        <textarea id="new-task-description" placeholder="Description (optional)"
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"></textarea>
+                        <select id="new-task-priority"
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            <option value="Low">Low Priority</option>
+                            <option value="Medium" selected>Medium Priority</option>
+                            <option value="High">High Priority</option>
+                        </select>
+                        <select id="new-task-status"
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            <option value="todo">To Do</option>
+                            <option value="doing">In Progress</option>
+                            <option value="done">Done</option>
+                        </select>
+
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" id="cancel-task-btn"
+                                class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700">
+                                Cancel
+                            </button>
+                            <button type="submit" id="save-task-btn"
+                                class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition dark:bg-indigo-500 dark:hover:bg-indigo-600">
+                                Save Task
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Kanban Columns -->
+            <div id="kanban-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- To Do Column -->
+                <div id="todo-column" class="bg-gray-200 dark:bg-gray-700 rounded-xl shadow-lg p-4 flex flex-col transition-colors duration-300">
+                    <h3 class="text-xl font-bold mb-4 text-gray-700 dark:text-white border-b-2 border-red-500 pb-2">To Do</h3>
+                    <div id="todo-tasks" class="column-content space-y-4" data-status="todo">
+                        <!-- Tasks rendered here -->
+                    </div>
+                </div>
+
+                <!-- In Progress Column -->
+                <div id="doing-column" class="bg-gray-200 dark:bg-gray-700 rounded-xl shadow-lg p-4 flex flex-col transition-colors duration-300">
+                    <h3 class="text-xl font-bold mb-4 text-gray-700 dark:text-white border-b-2 border-yellow-500 pb-2">In Progress</h3>
+                    <div id="doing-tasks" class="column-content space-y-4" data-status="doing">
+                        <!-- Tasks rendered here -->
+                    </div>
+                </div>
+
+                <!-- Done Column -->
+                <div id="done-column" class="bg-gray-200 dark:bg-gray-700 rounded-xl shadow-lg p-4 flex flex-col transition-colors duration-300">
+                    <h3 class="text-xl font-bold mb-4 text-gray-700 dark:text-white border-b-2 border-green-500 pb-2">Done</h3>
+                    <div id="done-tasks" class="column-content space-y-4" data-status="done">
+                        <!-- Tasks rendered here -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 border-t p-3 text-center text-gray-500 dark:text-gray-400 text-sm mt-auto transition-colors duration-300">
+        Kanban Lite | Backend URL: <span id="api-url-display"></span>
+    </footer>
+
+    <!-- Link to external JavaScript logic -->
+    <script src="app.js" defer></script>
+</body>
+</html>

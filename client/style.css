@@ -1,0 +1,48 @@
+/* Custom styles for the task cards and drag-and-drop effects */
+.task-card {
+    cursor: grab;
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+    min-height: 5rem;
+}
+.task-card:active {
+    cursor: grabbing;
+}
+
+/* Styling for the card being dragged */
+.dragging {
+    opacity: 0.4;
+    transform: scale(0.98);
+}
+
+/* Styling for dragover state on columns (Light Mode) */
+.column-content.drag-over {
+    background-color: #f0f4f8; /* Light blue-grey background */
+    border: 2px dashed #3b82f6;
+}
+
+/* Styling for dragover state on columns (Dark Mode) */
+.dark .column-content.drag-over {
+    background-color: #374151; /* Gray-700 */
+    border: 2px dashed #6366f1; /* Indigo-500 */
+}
+
+/* Scrollbar styling for the columns */
+.column-content {
+    max-height: calc(100vh - 12rem); /* Adjust based on header/footer size */
+    overflow-y: auto;
+    min-height: 200px;
+}
+
+/* Custom scrollbar track for light theme */
+.column-content::-webkit-scrollbar {
+    width: 8px;
+}
+.column-content::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1; /* Slate-300 */
+    border-radius: 4px;
+}
+
+/* Custom scrollbar track for dark theme */
+.dark .column-content::-webkit-scrollbar-thumb {
+    background-color: #4b5563; /* Gray-600 */
+}
