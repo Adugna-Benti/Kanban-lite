@@ -1,5 +1,5 @@
 // --- API & State Configuration ---
-const API_BASE_URL = 'http://localhost:5000'; // Make sure this matches your Express server port
+const API_BASE_URL = 'https://kanban-lite-q5jr.onrender.com'; // Make sure this matches your Express server port
 const TOKEN_KEY = 'kanban_lite_token';
 const THEME_KEY = 'kanban_lite_theme'; // New key for theme preference
 let currentToken = localStorage.getItem(TOKEN_KEY);
